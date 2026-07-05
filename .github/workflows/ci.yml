@@ -1,0 +1,45 @@
+name: CI
+
+# Runs on every push and pull request to main. The build step is the important
+# guardrail: if a blog post has broken frontmatter or the config is invalid,
+# the build fails here before anything is deployed.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+
+      # Checks internal links in the built HTML. External links to sites that
+      # block bots (LinkedIn, Medium, Amazon) are excluded, and this step never
+      # fails the build — it's informational only.
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@v2
+        continue-on-error: true
+        with:
+          args: >-
+            --no-progress
+            --exclude linkedin\.com
+            --exclude medium\.com
+            --exclude amazon\.
+            --exclude baos\.pub
+            --exclude short\.sweet\.pub
+            "./dist/**/*.html"

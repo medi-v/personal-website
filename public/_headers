@@ -1,0 +1,25 @@
+# Cloudflare Pages security + caching headers.
+# This file is copied to the site root at build time and applied to responses.
+
+/*
+  # Clickjacking + framing protection
+  X-Frame-Options: DENY
+  # Stop browsers from MIME-sniffing responses
+  X-Content-Type-Options: nosniff
+  # Only send the origin as referrer to other sites
+  Referrer-Policy: strict-origin-when-cross-origin
+  # Disable powerful APIs this site never uses
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), browsing-topics=()
+  # Force HTTPS for two years (only takes effect once served over HTTPS)
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  # Content Security Policy.
+  # - script-src 'self': no inline JS (the blog filter is an external, hashed
+  #   Astro bundle; the JSON-LD block is data, not executed).
+  # - style-src allows 'unsafe-inline' because the page uses inline style
+  #   attributes (fade-up delays, the progress-bar width). Style injection is
+  #   low risk compared to script injection, which stays locked down.
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; form-action 'self'; upgrade-insecure-requests
+
+# Hashed, immutable build assets can be cached forever
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

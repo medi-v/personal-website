@@ -32,24 +32,6 @@ const posts = (await getCollection('blog')).sort(
     </div>
   </section>
 
-  <script>
-    // Show only the posts whose category matches the chosen filter.
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-    const cards = document.querySelectorAll<HTMLElement>('#post-grid [data-category]');
-
-    buttons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const filter = button.dataset.filter;
-
-        // Highlight the active button
-        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
-
-        // Show matching cards, hide the rest
-        cards.forEach((card) => {
-          const show = filter === 'all' || card.dataset.category === filter;
-          card.style.display = show ? '' : 'none';
-        });
-      });
-    });
-  </script>
+  <!-- Loaded as an external self-hosted file so the CSP can stay strict -->
+  <script is:inline src="/blog-filter.js" defer></script>
 </Base>
