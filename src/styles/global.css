@@ -1,0 +1,170 @@
+/*
+  Global styles and design tokens.
+  This is the single place where the site's look is defined:
+  colors, fonts, and a few shared styles.
+*/
+@import "tailwindcss";
+
+@theme {
+  /* --- Colors (plain white, near-black ink, one clay accent) --- */
+  --color-paper: #ffffff;   /* page background */
+  --color-ink: #1a1917;     /* main text */
+  --color-muted: #6e6a63;   /* secondary text: dates, labels */
+  --color-line: #e5e2dc;    /* hairline borders */
+  --color-clay: #c15f3c;    /* the one accent: links, buttons */
+  --color-clay-dark: #a34e30; /* accent on hover (slightly darker) */
+
+  /* --- Fonts --- */
+  /* Newsreader: editorial serif for headings and body text */
+  --font-serif: "Newsreader Variable", Georgia, "Times New Roman", serif;
+  /* System sans for small UI text: nav, dates, tags, buttons */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+/* --- Base look of every page --- */
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-serif);
+  font-size: 1.125rem;      /* ~18px body text */
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Text selection uses the accent color */
+::selection {
+  background-color: var(--color-clay);
+  color: var(--color-paper);
+}
+
+/* Visible focus ring for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--color-clay);
+  outline-offset: 3px;
+}
+
+/*
+  Page-load animation: elements with .fade-up rise gently into place.
+  Stagger them by setting style="animation-delay: 0.1s" etc.
+  People who prefer reduced motion see no animation at all.
+*/
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up {
+    animation: none;
+  }
+}
+
+/*
+  Book progress bar: the clay fill grows from 0 to its target width
+  (set per element via the --bar-width variable) shortly after load.
+*/
+@keyframes grow-bar {
+  from {
+    width: 0;
+  }
+}
+
+.progress-fill {
+  width: var(--bar-width);
+  animation: grow-bar 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-fill {
+    animation: none;
+  }
+}
+
+/*
+  Blog filter buttons. The selected one (aria-pressed="true") fills clay.
+*/
+.filter-btn {
+  border: 1px solid var(--color-clay);
+  border-radius: 9999px;
+  padding: 0.35rem 1rem;
+  color: var(--color-clay);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.filter-btn:hover {
+  background-color: color-mix(in srgb, var(--color-clay) 10%, transparent);
+}
+
+.filter-btn[aria-pressed="true"] {
+  background-color: var(--color-clay);
+  color: var(--color-paper);
+}
+
+/*
+  Styling for blog post text (rendered from Markdown).
+  Applied via class="prose" on the article wrapper.
+*/
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose p {
+  margin-bottom: 1.25rem;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.prose ul { list-style: disc; }
+.prose ol { list-style: decimal; }
+
+.prose li { margin-bottom: 0.4rem; }
+
+.prose a {
+  color: var(--color-clay);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose a:hover { color: var(--color-clay-dark); }
+
+.prose blockquote {
+  border-left: 2px solid var(--color-clay);
+  padding-left: 1.25rem;
+  font-style: italic;
+  color: var(--color-muted);
+  margin-bottom: 1.25rem;
+}
+
+.prose code {
+  font-size: 0.9em;
+  background-color: var(--color-line);
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+}
+
+.prose strong { font-weight: 600; }

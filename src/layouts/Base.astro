@@ -1,0 +1,131 @@
+---
+// Base layout: wraps every page with the <head>, header and footer.
+import '../styles/global.css';
+// Newsreader font, self-hosted (no Google Fonts, no tracking)
+import '@fontsource-variable/newsreader';
+import '@fontsource-variable/newsreader/wght-italic.css';
+import { LINKEDIN_URL } from '../consts';
+
+interface Props {
+  title: string;
+  description: string;
+  // "website" for normal pages, "article" for blog posts
+  type?: 'website' | 'article';
+  // Social-share image path (defaults to the site card)
+  image?: string;
+}
+
+const { title, description, type = 'website', image = '/og.jpg' } = Astro.props;
+
+// Absolute URLs — search engines and social platforms need the full address
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const imageUrl = new URL(image, Astro.site);
+
+// On the home page the header links to the blog; everywhere else it leads back home.
+const isHome = Astro.url.pathname === '/';
+
+// Structured data: tells Google who this site is about (helps rich results).
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Sergey Völker',
+  jobTitle: 'AI Enablement & Program Manager',
+  address: { '@type': 'PostalAddress', addressLocality: 'Berlin', addressCountry: 'DE' },
+  url: Astro.site?.href,
+  sameAs: [LINKEDIN_URL, 'https://medium.com/@sergey.medi'],
+  knowsAbout: [
+    'AI enablement',
+    'Program management',
+    'Organizational change management',
+    'Agile delivery',
+  ],
+};
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Sergey Völker" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Sergey Völker — Blog"
+      href={new URL('rss.xml', Astro.site)}
+    />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Open Graph (LinkedIn, Facebook, iMessage, Slack …) -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Sergey Völker" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Sergey Völker — Program Manager, Organizational Change, AI Enablement" />
+
+    <!-- Twitter / X card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    <!-- Structured data for search engines -->
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+  </head>
+  <body>
+    <!-- Lets keyboard users jump straight to the content -->
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:bg-paper focus:px-4 focus:py-2 focus:font-sans focus:text-sm"
+    >
+      Skip to content
+    </a>
+
+    <div class="mx-auto max-w-3xl px-6">
+      <header class="flex justify-end pt-10 pb-4">
+        <nav class="font-sans text-sm" aria-label="Main">
+          {
+            isHome ? (
+              <a href="/blog" class="text-muted hover:text-clay">
+                Blog&nbsp;→
+              </a>
+            ) : (
+              <a href="/" class="text-muted hover:text-clay">
+                ←&nbsp;Home
+              </a>
+            )
+          }
+        </nav>
+      </header>
+
+      <main id="main">
+        <slot />
+      </main>
+
+      <footer class="mt-24 mb-12 border-t border-clay pt-8">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noopener"
+            class="inline-block rounded-full bg-clay px-5 py-2.5 font-sans text-sm font-medium text-paper transition-colors hover:bg-clay-dark"
+          >
+            Connect on LinkedIn
+          </a>
+          <p class="font-sans text-xs text-muted">
+            © {new Date().getFullYear()} Sergey Völker ·
+            <a href="/rss.xml" class="hover:text-clay">RSS</a>
+          </p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+# Allow all search engines and point them to the sitemap.
+# PLACEHOLDER: update the domain when you have a real one.
+User-agent: *
+Allow: /
+
+Sitemap: https://sergeyvoelker.pages.dev/sitemap-index.xml
