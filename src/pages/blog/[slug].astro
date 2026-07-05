@@ -1,0 +1,46 @@
+---
+// Page for a single native blog post (external posts never get a page here —
+// their cards link straight out to the external URL).
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  // Only posts WITHOUT external_url get their own page
+  const posts = await getCollection('blog', ({ data }) => !data.external_url);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+
+const formattedDate = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+}).format(post.data.date);
+---
+
+<Base title={`${post.data.title} — Sergey Völker`} description={post.data.summary} type="article">
+  <article class="pt-16">
+    <header class="mb-10">
+      <p class="fade-up font-sans text-xs text-muted">
+        <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+        {post.data.tags.length > 0 && <span> · {post.data.tags.join(' · ')}</span>}
+      </p>
+      <h1 class="fade-up mt-3 text-4xl font-medium tracking-tight" style="animation-delay: 0.08s">
+        {post.data.title}
+      </h1>
+    </header>
+    <div class="prose fade-up" style="animation-delay: 0.16s">
+      <Content />
+    </div>
+    <p class="mt-12">
+      <a href="/blog" class="font-sans text-sm text-clay underline underline-offset-4 hover:text-clay-dark">
+        ← All posts
+      </a>
+    </p>
+  </article>
+</Base>

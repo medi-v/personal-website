@@ -1,0 +1,12 @@
+# Dependencies and build output — never edit these by hand
+node_modules/
+dist/
+.astro/
+
+# Private / source files kept OFF GitHub on purpose:
+# - the CV PDF contains your phone number (do not publish)
+# - the original photo/cover files; the website only needs the smaller
+#   processed copies in public/ (headshot.jpg, book-cover.jpg)
+SergeyVoelkeCVJune.pdf
+file_000000001b3871f4b6335aea59d8dda6(1).png
+book cover.jpg
