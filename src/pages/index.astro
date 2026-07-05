@@ -54,15 +54,19 @@ const work = [
   <section class="pt-12 pb-20">
     <div class="flex flex-col-reverse gap-8 sm:flex-row sm:items-stretch sm:justify-between">
       <div class="flex max-w-lg flex-col">
-        <h1 class="fade-up text-5xl font-medium tracking-tight sm:text-6xl">
-          Sergey Völker
+        <!-- Name + role live in one H1 so the heading carries the keywords,
+             while the two spans keep the original stacked visual. -->
+        <h1>
+          <span class="fade-up block text-5xl font-medium tracking-tight sm:text-6xl">
+            Sergey Völker
+          </span>
+          <span
+            class="fade-up mt-4 block font-sans text-xs tracking-widest text-clay-text uppercase"
+            style="animation-delay: 0.08s"
+          >
+            Program Manager × Organizational Change × AI Enablement
+          </span>
         </h1>
-        <p
-          class="fade-up mt-4 font-sans text-xs tracking-widest text-clay-text uppercase"
-          style="animation-delay: 0.08s"
-        >
-          Program Manager × Organizational Change × AI Enablement
-        </p>
         <p class="fade-up mt-8 text-xl leading-relaxed" style="animation-delay: 0.16s">
           Ten years leading delivery, programs, and organizational change: from
           Deutsche Bahn’s rail infrastructure to fintech SaaS at LucaNet. Engineer,
