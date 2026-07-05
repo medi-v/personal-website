@@ -10,3 +10,9 @@ dist/
 SergeyVoelkeCVJune.pdf
 file_000000001b3871f4b6335aea59d8dda6(1).png
 book cover.jpg
+
+# Internal working notes — kept local, not published:
+# - claude.md: personal instructions/preferences for the AI assistant
+# - SPEC.md: internal build spec with decisions and placeholders
+claude.md
+SPEC.md

@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Watch npm dependencies and open PRs when updates (incl. security fixes) ship.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      # Bundle minor/patch bumps into one PR to reduce noise
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
+  # Keep the GitHub Actions used in CI up to date too.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

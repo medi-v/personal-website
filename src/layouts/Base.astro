@@ -13,9 +13,12 @@ interface Props {
   type?: 'website' | 'article';
   // Social-share image path (defaults to the site card)
   image?: string;
+  // Extra JSON-LD schema objects to add on top of the Person schema
+  // (e.g. Book on the home page, BlogPosting on a post page)
+  structuredData?: Record<string, unknown>[];
 }
 
-const { title, description, type = 'website', image = '/og.jpg' } = Astro.props;
+const { title, description, type = 'website', image = '/og.jpg', structuredData = [] } = Astro.props;
 
 // Absolute URLs — search engines and social platforms need the full address
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -49,7 +52,11 @@ const personSchema = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="author" content="Sergey Völker" />
+    <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="canonical" href={canonical} />
     <link
       rel="alternate"
@@ -79,6 +86,11 @@ const personSchema = {
 
     <!-- Structured data for search engines -->
     <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    {
+      structuredData.map((schema) => (
+        <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+      ))
+    }
   </head>
   <body>
     <!-- Lets keyboard users jump straight to the content -->
@@ -94,11 +106,11 @@ const personSchema = {
         <nav class="font-sans text-sm" aria-label="Main">
           {
             isHome ? (
-              <a href="/blog" class="text-muted hover:text-clay">
+              <a href="/blog" class="text-muted hover:text-clay-text">
                 Blog&nbsp;→
               </a>
             ) : (
-              <a href="/" class="text-muted hover:text-clay">
+              <a href="/" class="text-muted hover:text-clay-text">
                 ←&nbsp;Home
               </a>
             )
@@ -116,13 +128,13 @@ const personSchema = {
             href={LINKEDIN_URL}
             target="_blank"
             rel="noopener"
-            class="inline-block rounded-full bg-clay px-5 py-2.5 font-sans text-sm font-medium text-paper transition-colors hover:bg-clay-dark"
+            class="inline-block rounded-full bg-clay-text px-5 py-2.5 font-sans text-sm font-medium text-paper transition-colors hover:bg-clay-text-hover"
           >
             Connect on LinkedIn
           </a>
           <p class="font-sans text-xs text-muted">
             © {new Date().getFullYear()} Sergey Völker ·
-            <a href="/rss.xml" class="hover:text-clay">RSS</a>
+            <a href="/rss.xml" class="hover:text-clay-text">RSS</a>
           </p>
         </div>
       </footer>

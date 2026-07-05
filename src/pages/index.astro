@@ -11,6 +11,21 @@ const posts = (await getCollection('blog'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
+// Structured data for the book (helps Google show it as a rich result)
+const bookSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Book',
+  name: 'Introduction to AI Implementation for Managers',
+  author: [
+    { '@type': 'Person', name: 'Sergey Völker' },
+    { '@type': 'Person', name: 'Oscar Garcia' },
+  ],
+  publisher: { '@type': 'Organization', name: 'Apress / Springer Nature' },
+  inLanguage: 'en',
+  url: BOOK_URL,
+  about: ['Artificial intelligence', 'Change management', 'Leadership'],
+};
+
 // The "Selected work" cards — each one links to a public source
 const work = [
   {
@@ -34,7 +49,7 @@ const work = [
 ];
 ---
 
-<Base title={HOME_TITLE} description={SITE_DESCRIPTION}>
+<Base title={HOME_TITLE} description={SITE_DESCRIPTION} structuredData={[bookSchema]}>
   <!-- ===== Hero ===== -->
   <section class="pt-12 pb-20">
     <div class="flex flex-col-reverse gap-8 sm:flex-row sm:items-stretch sm:justify-between">
@@ -43,7 +58,7 @@ const work = [
           Sergey Völker
         </h1>
         <p
-          class="fade-up mt-4 font-sans text-xs tracking-widest text-clay uppercase"
+          class="fade-up mt-4 font-sans text-xs tracking-widest text-clay-text uppercase"
           style="animation-delay: 0.08s"
         >
           Program Manager × Organizational Change × AI Enablement
@@ -58,7 +73,7 @@ const work = [
             href={LINKEDIN_URL}
             target="_blank"
             rel="noopener"
-            class="inline-block rounded-full bg-clay px-5 py-2.5 font-sans text-sm font-medium text-paper transition-colors hover:bg-clay-dark"
+            class="inline-block rounded-full bg-clay-text px-5 py-2.5 font-sans text-sm font-medium text-paper transition-colors hover:bg-clay-text-hover"
           >
             Connect on LinkedIn
           </a>
@@ -79,7 +94,7 @@ const work = [
   <section aria-labelledby="book-heading" class="border-t border-clay py-16">
     <div class="flex flex-col gap-8 sm:flex-row sm:items-start">
       <div>
-        <p class="font-sans text-xs tracking-widest text-clay uppercase">The book</p>
+        <p class="font-sans text-xs tracking-widest text-clay-text uppercase">The book</p>
         <h2 id="book-heading" class="mt-3 text-3xl font-medium tracking-tight">
           Introduction to AI Implementation for&nbsp;Managers
         </h2>
@@ -99,14 +114,14 @@ const work = [
           href={BOOK_URL}
           target="_blank"
           rel="noopener"
-          class="mt-6 inline-block font-sans text-sm font-medium text-clay underline underline-offset-4 hover:text-clay-dark"
+          class="mt-6 inline-block font-sans text-sm font-medium text-clay-text underline underline-offset-4 hover:text-clay-text-hover"
         >
           Pre-order on Amazon ↗
         </a>
 
         <!-- The making of the book: a light progress bar from idea to publication -->
         <div class="mt-10">
-          <p class="font-sans text-xs tracking-widest text-clay uppercase">The making of</p>
+          <p class="font-sans text-xs tracking-widest text-clay-text uppercase">The making of</p>
           <div
             class="mt-4 h-2 rounded-full bg-line"
             role="img"
@@ -144,7 +159,7 @@ const work = [
 
   <!-- ===== About me ===== -->
   <section aria-labelledby="about-heading" class="border-t border-clay py-16">
-    <p class="font-sans text-xs tracking-widest text-clay uppercase">About me</p>
+    <p class="font-sans text-xs tracking-widest text-clay-text uppercase">About me</p>
     <h2 id="about-heading" class="mt-3 text-3xl font-medium tracking-tight">
       Change that is practical, useful, and human
     </h2>
@@ -190,7 +205,7 @@ const work = [
             >
               <h3 class="text-lg leading-snug font-medium">{item.title}</h3>
               <p class="mt-2 text-sm text-muted">{item.text}</p>
-              <span class="mt-auto pt-4 font-sans text-xs font-medium text-clay">
+              <span class="mt-auto pt-4 font-sans text-xs font-medium text-clay-text">
                 {item.source} ↗
               </span>
             </a>
@@ -204,7 +219,7 @@ const work = [
   <section aria-labelledby="writing-heading" class="border-t border-clay py-16">
     <div class="flex items-baseline justify-between">
       <h2 id="writing-heading" class="text-3xl font-medium tracking-tight">From the blog</h2>
-      <a href="/blog" class="font-sans text-sm text-clay underline underline-offset-4 hover:text-clay-dark">
+      <a href="/blog" class="font-sans text-sm text-clay-text underline underline-offset-4 hover:text-clay-text-hover">
         All posts
       </a>
     </div>

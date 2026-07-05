@@ -21,9 +21,26 @@ const formattedDate = new Intl.DateTimeFormat('en-GB', {
   month: 'long',
   year: 'numeric',
 }).format(post.data.date);
+
+// Structured data marking this page as a blog post
+const postSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.data.title,
+  description: post.data.summary,
+  datePublished: post.data.date.toISOString(),
+  author: { '@type': 'Person', name: 'Sergey Völker' },
+  url: new URL(Astro.url.pathname, Astro.site).href,
+  keywords: post.data.tags.join(', '),
+};
 ---
 
-<Base title={`${post.data.title} — Sergey Völker`} description={post.data.summary} type="article">
+<Base
+  title={`${post.data.title} — Sergey Völker`}
+  description={post.data.summary}
+  type="article"
+  structuredData={[postSchema]}
+>
   <article class="pt-16">
     <header class="mb-10">
       <p class="fade-up font-sans text-xs text-muted">
@@ -38,7 +55,7 @@ const formattedDate = new Intl.DateTimeFormat('en-GB', {
       <Content />
     </div>
     <p class="mt-12">
-      <a href="/blog" class="font-sans text-sm text-clay underline underline-offset-4 hover:text-clay-dark">
+      <a href="/blog" class="font-sans text-sm text-clay-text underline underline-offset-4 hover:text-clay-text-hover">
         ← All posts
       </a>
     </p>

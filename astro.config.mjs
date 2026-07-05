@@ -3,11 +3,12 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-// PLACEHOLDER: when you have a real domain, replace the `site` value below,
-// e.g. site: 'https://sergeyvoelker.com'
-// It is used to build correct links in the RSS feed and the sitemap.
+// The live domain. Used to build absolute links in the RSS feed, sitemap,
+// canonical tags, and social-share metadata.
+// NOTE: sergeyvoelker.com is the intended domain (purchase pending). Until DNS
+// points here, Cloudflare also serves the site at a free *.pages.dev address.
 export default defineConfig({
-  site: 'https://sergeyvoelker.pages.dev',
+  site: 'https://sergeyvoelker.com',
   integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],

@@ -1,0 +1,30 @@
+---
+// Custom "page not found" screen. Cloudflare Pages serves this automatically
+// for any unknown URL.
+import Base from '../layouts/Base.astro';
+---
+
+<Base
+  title="Page not found — Sergey Völker"
+  description="This page doesn’t exist."
+>
+  <section class="flex flex-col items-start py-24">
+    <p class="fade-up font-sans text-xs tracking-widest text-clay-text uppercase">
+      Error 404
+    </p>
+    <h1 class="fade-up mt-3 text-4xl font-medium tracking-tight" style="animation-delay: 0.08s">
+      This page doesn’t exist
+    </h1>
+    <p class="fade-up mt-4 max-w-prose text-muted" style="animation-delay: 0.16s">
+      The link may be broken or the page may have moved.
+    </p>
+    <div class="fade-up mt-8 flex gap-6 font-sans text-sm" style="animation-delay: 0.24s">
+      <a href="/" class="text-clay-text underline underline-offset-4 hover:text-clay-text-hover">
+        ← Back home
+      </a>
+      <a href="/blog" class="text-clay-text underline underline-offset-4 hover:text-clay-text-hover">
+        Read the blog
+      </a>
+    </div>
+  </section>
+</Base>

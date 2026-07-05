@@ -11,8 +11,19 @@
   --color-ink: #1a1917;     /* main text */
   --color-muted: #6e6a63;   /* secondary text: dates, labels */
   --color-line: #e5e2dc;    /* hairline borders */
-  --color-clay: #c15f3c;    /* the one accent: links, buttons */
-  --color-clay-dark: #a34e30; /* accent on hover (slightly darker) */
+  /*
+    Two shades of the same clay accent:
+    - clay (#c15f3c) is used ONLY for graphical elements — borders, the
+      decorative dot, the progress bar, the focus ring. These need just a
+      3:1 contrast ratio, which it meets (4.22:1 on white).
+    - clay-text (#a34e30) is used for all TEXT and for button fills, where
+      WCAG AA needs 4.5:1. It reaches 5.69:1 on white, so small labels and
+      links stay accessible.
+  */
+  --color-clay: #c15f3c;           /* decorative accent (borders, dots, bar) */
+  --color-clay-dark: #a34e30;      /* hover for graphical elements (card borders) */
+  --color-clay-text: #a34e30;      /* accent text & button fills — AA (5.69:1) */
+  --color-clay-text-hover: #8a4228; /* darker accent for text/button hover (7.26:1) */
 
   /* --- Fonts --- */
   /* Newsreader: editorial serif for headings and body text */
@@ -94,19 +105,19 @@ body {
   Blog filter buttons. The selected one (aria-pressed="true") fills clay.
 */
 .filter-btn {
-  border: 1px solid var(--color-clay);
+  border: 1px solid var(--color-clay-text);
   border-radius: 9999px;
   padding: 0.35rem 1rem;
-  color: var(--color-clay);
+  color: var(--color-clay-text);
   transition: background-color 0.2s, color 0.2s;
 }
 
 .filter-btn:hover {
-  background-color: color-mix(in srgb, var(--color-clay) 10%, transparent);
+  background-color: color-mix(in srgb, var(--color-clay-text) 10%, transparent);
 }
 
 .filter-btn[aria-pressed="true"] {
-  background-color: var(--color-clay);
+  background-color: var(--color-clay-text);
   color: var(--color-paper);
 }
 
@@ -145,12 +156,12 @@ body {
 .prose li { margin-bottom: 0.4rem; }
 
 .prose a {
-  color: var(--color-clay);
+  color: var(--color-clay-text);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.prose a:hover { color: var(--color-clay-dark); }
+.prose a:hover { color: var(--color-clay-text-hover); }
 
 .prose blockquote {
   border-left: 2px solid var(--color-clay);
