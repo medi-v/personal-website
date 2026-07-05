@@ -1,0 +1,215 @@
+---
+// Home page: hero → book → background → selected work → writing.
+// All facts here come from the CV or public links — nothing invented.
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import PostCard from '../components/PostCard.astro';
+import { HOME_TITLE, SITE_DESCRIPTION, LINKEDIN_URL, BOOK_URL } from '../consts';
+
+// Latest 3 blog entries for the "Writing" section
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+// The "Selected work" cards — each one links to a public source
+const work = [
+  {
+    title: 'An automated context layer for an agentic SDLC',
+    source: 'Driver.ai case study',
+    url: 'https://www.driver.ai/customer-stories/lucanet-customer-story',
+    text: 'LucaNet used Driver to automate codebase context, cutting manual documentation overhead to support agentic software engineering.',
+  },
+  {
+    title: 'Delivery cycle time, cut by half',
+    source: 'Plandek case study',
+    url: 'https://plandek.com/case-studies/lucanet',
+    text: 'As Delivery Manager I introduced Plandek analytics while we raised sprint completion to 85% across 20+ teams.',
+  },
+  {
+    title: 'AI Summer School, 200+ participants',
+    source: 'LinkedIn',
+    url: 'https://www.linkedin.com/posts/activity-7364536808044474369-l6i1',
+    text: 'LucaNet’s first AI Summer School: 200+ colleagues in a digital classroom over two weeks — employee-led sessions, hands-on workshops, open discussions.',
+  },
+];
+---
+
+<Base title={HOME_TITLE} description={SITE_DESCRIPTION}>
+  <!-- ===== Hero ===== -->
+  <section class="pt-12 pb-20">
+    <div class="flex flex-col-reverse gap-8 sm:flex-row sm:items-stretch sm:justify-between">
+      <div class="flex max-w-lg flex-col">
+        <h1 class="fade-up text-5xl font-medium tracking-tight sm:text-6xl">
+          Sergey Völker
+        </h1>
+        <p
+          class="fade-up mt-4 font-sans text-xs tracking-widest text-clay uppercase"
+          style="animation-delay: 0.08s"
+        >
+          Program Manager × Organizational Change × AI Enablement
+        </p>
+        <p class="fade-up mt-8 text-xl leading-relaxed" style="animation-delay: 0.16s">
+          Ten years leading delivery, programs, and organizational change: from
+          Deutsche Bahn’s rail infrastructure to fintech SaaS at LucaNet. Engineer,
+          business psychologist, and co-author of a book on AI implementation.
+        </p>
+        <div class="fade-up mt-auto pt-8" style="animation-delay: 0.24s">
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noopener"
+            class="inline-block rounded-full bg-clay px-5 py-2.5 font-sans text-sm font-medium text-paper transition-colors hover:bg-clay-dark"
+          >
+            Connect on LinkedIn
+          </a>
+        </div>
+      </div>
+      <img
+        src="/headshot.jpg"
+        alt="Portrait of Sergey Völker"
+        width="440"
+        height="520"
+        class="fade-up mx-auto h-72 w-60 shrink-0 rounded-lg object-cover object-top sm:mx-0 sm:h-auto sm:self-stretch"
+        style="animation-delay: 0.12s"
+      />
+    </div>
+  </section>
+
+  <!-- ===== The book ===== -->
+  <section aria-labelledby="book-heading" class="border-t border-clay py-16">
+    <div class="flex flex-col gap-8 sm:flex-row sm:items-start">
+      <div>
+        <p class="font-sans text-xs tracking-widest text-clay uppercase">The book</p>
+        <h2 id="book-heading" class="mt-3 text-3xl font-medium tracking-tight">
+          Introduction to AI Implementation for&nbsp;Managers
+        </h2>
+        <p class="mt-2 font-sans text-sm text-muted">
+          A Guide to Practical AI Solutions for Non-Technical Professionals<br />
+          Co-authored with Oscar Garcia · Apress / Springer Nature
+        </p>
+        <p class="mt-6 max-w-prose">
+          <em>Introduction to AI Implementation for Managers</em> is a book built from
+          three disciplines: Engineering × Organizational psychology × Product design.
+          It examines how successful AI implementation works: the structure, the people,
+          and the decisions made before anyone opens a tool. Grounded in research, real
+          cases, and the authors’ own experience, it gives leaders and experts a
+          practical framework for building the foundations that make AI create value.
+        </p>
+        <a
+          href={BOOK_URL}
+          target="_blank"
+          rel="noopener"
+          class="mt-6 inline-block font-sans text-sm font-medium text-clay underline underline-offset-4 hover:text-clay-dark"
+        >
+          Pre-order on Amazon ↗
+        </a>
+
+        <!-- The making of the book: a light progress bar from idea to publication -->
+        <div class="mt-10">
+          <p class="font-sans text-xs tracking-widest text-clay uppercase">The making of</p>
+          <div
+            class="mt-4 h-2 rounded-full bg-line"
+            role="img"
+            aria-label="Book progress: manuscript finished in July 2026, awaiting publication in late 2026"
+          >
+            <div class="progress-fill relative h-2 rounded-full bg-clay" style="--bar-width: 88%">
+              <!-- the 'you are here' marker sits at the end of the fill -->
+              <span
+                class="absolute top-1/2 right-0 h-4 w-4 -translate-y-1/2 translate-x-1/2 rounded-full border-2 border-clay bg-paper"
+              ></span>
+            </div>
+          </div>
+          <div class="mt-3 flex justify-between font-sans text-xs text-muted">
+            <span>Early 2025 · the idea</span>
+            <span>Late 2026 · published</span>
+          </div>
+          <p class="mt-4 font-sans text-xs leading-relaxed text-muted">
+            Gathering ideas &amp; courage → first talks with Oscar → concept &amp;
+            framework → finding a publisher (with its ups and downs) → writing,
+            writing, writing →
+            <span class="text-ink">July 2026: final manuscript for approval</span> →
+            publication.
+          </p>
+        </div>
+      </div>
+      <img
+        src="/book-cover.jpg"
+        alt="Book cover: Introduction to AI Implementation for Managers"
+        width="480"
+        height="728"
+        class="w-36 shrink-0 self-center rounded-md shadow-md sm:w-44 sm:self-start"
+      />
+    </div>
+  </section>
+
+  <!-- ===== About me ===== -->
+  <section aria-labelledby="about-heading" class="border-t border-clay py-16">
+    <p class="font-sans text-xs tracking-widest text-clay uppercase">About me</p>
+    <h2 id="about-heading" class="mt-3 text-3xl font-medium tracking-tight">
+      Change that is practical, useful, and human
+    </h2>
+    <div class="mt-6 max-w-prose space-y-4">
+      <p>
+        I work at the intersection of AI enablement, engineering transformation, and
+        organizational change. In my current role at a global fintech SaaS company, I
+        turn strategic goals into adoption, better workflows, and measurable
+        operational impact.
+      </p>
+      <p>
+        Over the past ten years I’ve led cross-functional work across engineering,
+        delivery, and transformation — from large-scale operational environments at
+        Deutsche Bahn to fintech SaaS across 20+ teams at LucaNet. Along the way: a
+        post-M&amp;A integration of 40+ experts, an on-prem-to-SaaS transformation,
+        and a nationwide quality network I founded that became an advisory body to
+        senior management.
+      </p>
+      <p>
+        My background combines engineering with business psychology. It lets me work
+        across technical and business contexts, connect with both developers and
+        executives, and move change from idea to execution with empathy, structure,
+        and a strong focus on impact. Certified across the spectrum from waterfall to
+        agile — PRINCE2, Professional Scrum Master II, Certified Agile Transformation
+        Manager, Microsoft AI Transformation Leader — I work in German, English, and
+        Russian.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Selected work ===== -->
+  <section aria-labelledby="work-heading" class="border-t border-clay py-16">
+    <h2 id="work-heading" class="text-3xl font-medium tracking-tight">Selected work</h2>
+    <div class="mt-8 grid gap-4 sm:grid-cols-3">
+      {
+        work.map((item) => (
+          <article class="h-full">
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener"
+              class="flex h-full flex-col rounded-lg border border-clay p-5 transition-colors hover:border-clay-dark hover:shadow-sm"
+            >
+              <h3 class="text-lg leading-snug font-medium">{item.title}</h3>
+              <p class="mt-2 text-sm text-muted">{item.text}</p>
+              <span class="mt-auto pt-4 font-sans text-xs font-medium text-clay">
+                {item.source} ↗
+              </span>
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- ===== Writing ===== -->
+  <section aria-labelledby="writing-heading" class="border-t border-clay py-16">
+    <div class="flex items-baseline justify-between">
+      <h2 id="writing-heading" class="text-3xl font-medium tracking-tight">From the blog</h2>
+      <a href="/blog" class="font-sans text-sm text-clay underline underline-offset-4 hover:text-clay-dark">
+        All posts
+      </a>
+    </div>
+    <div class="mt-8 grid gap-4 sm:grid-cols-3">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+</Base>

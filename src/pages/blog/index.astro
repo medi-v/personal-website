@@ -1,0 +1,55 @@
+---
+// Blog overview: every post, newest first.
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<Base
+  title="Blog — Sergey Völker"
+  description="Articles and posts by Sergey Völker on AI adoption, delivery, leadership, and organizational change."
+>
+  <section class="pt-16">
+    <h1 class="fade-up text-4xl font-medium tracking-tight">Blog</h1>
+    <p class="fade-up mt-4 max-w-prose text-muted" style="animation-delay: 0.08s">
+      Notes on AI adoption, delivery, leadership, and life. Some pieces live here,
+      others link out to Medium or LinkedIn — those are marked.
+    </p>
+
+    <!-- Filter buttons. The script below shows/hides cards by their category. -->
+    <div class="fade-up mt-8 flex flex-wrap gap-2 font-sans text-sm" style="animation-delay: 0.12s" role="group" aria-label="Filter posts">
+      <button type="button" class="filter-btn" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="filter-btn" data-filter="AI & work" aria-pressed="false">AI &amp; work</button>
+      <button type="button" class="filter-btn" data-filter="Reflections" aria-pressed="false">Reflections</button>
+    </div>
+
+    <div id="post-grid" class="fade-up mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" style="animation-delay: 0.16s">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  </section>
+
+  <script>
+    // Show only the posts whose category matches the chosen filter.
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const cards = document.querySelectorAll<HTMLElement>('#post-grid [data-category]');
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const filter = button.dataset.filter;
+
+        // Highlight the active button
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+
+        // Show matching cards, hide the rest
+        cards.forEach((card) => {
+          const show = filter === 'all' || card.dataset.category === filter;
+          card.style.display = show ? '' : 'none';
+        });
+      });
+    });
+  </script>
+</Base>

@@ -1,0 +1,36 @@
+---
+// One blog entry, displayed as a card in a grid. Two behaviors:
+// - external post (has external_url): links out, shows a source label like "Medium ↗"
+// - native post: links to the post page on this site
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const isExternal = Boolean(post.data.external_url);
+const href = post.data.external_url ?? `/blog/${post.id}/`;
+
+const formattedDate = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+}).format(post.data.date);
+---
+
+<article class="h-full" data-category={post.data.category}>
+  <a
+    href={href}
+    target={isExternal ? '_blank' : undefined}
+    rel={isExternal ? 'noopener' : undefined}
+    class="flex h-full flex-col rounded-lg border border-clay p-5 transition-colors hover:border-clay-dark hover:shadow-sm"
+  >
+    <div class="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1 font-sans text-xs text-muted">
+      <time datetime={post.data.date.toISOString()}>{formattedDate}</time>
+      {isExternal && <span class="text-clay">{post.data.external_source ?? 'External'} ↗</span>}
+    </div>
+    <h3 class="text-lg leading-snug font-medium">{post.data.title}</h3>
+    <p class="mt-2 line-clamp-3 text-sm text-muted">{post.data.summary}</p>
+  </a>
+</article>
