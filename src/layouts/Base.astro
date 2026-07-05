@@ -4,7 +4,7 @@ import '../styles/global.css';
 // Newsreader font, self-hosted (no Google Fonts, no tracking)
 import '@fontsource-variable/newsreader';
 import '@fontsource-variable/newsreader/wght-italic.css';
-import { LINKEDIN_URL } from '../consts';
+import { LINKEDIN_URL, PROFILE_URLS, GOOGLE_SITE_VERIFICATION, BING_SITE_VERIFICATION } from '../consts';
 
 interface Props {
   title: string;
@@ -35,7 +35,7 @@ const personSchema = {
   jobTitle: 'AI Enablement & Program Manager',
   address: { '@type': 'PostalAddress', addressLocality: 'Berlin', addressCountry: 'DE' },
   url: Astro.site?.href,
-  sameAs: [LINKEDIN_URL, 'https://medium.com/@sergey.medi'],
+  sameAs: PROFILE_URLS,
   knowsAbout: [
     'AI enablement',
     'Program management',
@@ -53,6 +53,13 @@ const personSchema = {
     <meta name="description" content={description} />
     <meta name="author" content="Sergey Völker" />
     <meta name="theme-color" content="#ffffff" />
+    {/* Ownership proof for Google Search Console / Bing — only rendered once a code is set in consts.ts */}
+    {GOOGLE_SITE_VERIFICATION && (
+      <meta name="google-site-verification" content={GOOGLE_SITE_VERIFICATION} />
+    )}
+    {BING_SITE_VERIFICATION && (
+      <meta name="msvalidate.01" content={BING_SITE_VERIFICATION} />
+    )}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -132,11 +139,14 @@ const personSchema = {
           >
             Connect on LinkedIn
           </a>
-          <p class="font-sans text-xs text-muted">
-            © {new Date().getFullYear()} Sergey Völker ·
-            <a href="/rss.xml" class="hover:text-clay-text">RSS</a>
-          </p>
+          <p class="font-sans text-xs text-muted">© {new Date().getFullYear()} Sergey Völker</p>
         </div>
+        <!-- Small print: legal + feed links, kept quiet on their own line -->
+        <p class="mt-6 font-sans text-xs text-muted">
+          <a href="/impressum" class="hover:text-clay-text">Impressum</a> ·
+          <a href="/privacy" class="hover:text-clay-text">Privacy</a> ·
+          <a href="/rss.xml" class="hover:text-clay-text">RSS</a>
+        </p>
       </footer>
     </div>
   </body>
