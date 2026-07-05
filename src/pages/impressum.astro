@@ -1,0 +1,50 @@
+---
+// Legal notice (Impressum) — required in Germany under § 5 DDG.
+//
+// The private contact details (address, email) are NOT written in this file.
+// They are injected at build time from environment variables:
+//   • locally from a git-ignored .env file
+//   • in production from Cloudflare Pages → Settings → Variables and Secrets
+// This keeps the home address out of the source code and git history, while it
+// still appears on the published page as the law requires.
+// (Template only — have the final wording checked by a professional.)
+import Base from '../layouts/Base.astro';
+
+const name = import.meta.env.IMPRESSUM_NAME ?? 'Sergey Völker';
+const street = import.meta.env.IMPRESSUM_STREET ?? '[Street and house number]';
+const city = import.meta.env.IMPRESSUM_CITY ?? '[Postal code and city]';
+const country = import.meta.env.IMPRESSUM_COUNTRY ?? 'Germany';
+const email = import.meta.env.IMPRESSUM_EMAIL ?? '[contact email]';
+---
+
+<Base
+  title="Impressum — Sergey Völker"
+  description="Legal notice (Impressum) for sergeyvoelker.com."
+>
+  <article class="pt-16">
+    <h1 class="text-4xl font-medium tracking-tight">Impressum</h1>
+    <div class="prose mt-8">
+      <p class="text-muted">Information pursuant to § 5 DDG (Digitale-Dienste-Gesetz).</p>
+
+      <h2>Responsible for this website</h2>
+      <p>
+        {name}<br />
+        {street}<br />
+        {city}<br />
+        {country}
+      </p>
+
+      <h2>Contact</h2>
+      <p>Email: <a href={`mailto:${email}`}>{email}</a></p>
+
+      <h2>Responsible for content pursuant to § 18 (2) MStV</h2>
+      <p>{name} (address as above)</p>
+
+      <h2>Consumer dispute resolution</h2>
+      <p>
+        We are not willing or obliged to take part in dispute resolution
+        proceedings before a consumer arbitration board.
+      </p>
+    </div>
+  </article>
+</Base>

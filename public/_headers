@@ -18,7 +18,10 @@
   # - style-src allows 'unsafe-inline' because the page uses inline style
   #   attributes (fade-up delays, the progress-bar width). Style injection is
   #   low risk compared to script injection, which stays locked down.
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self'; form-action 'self'; upgrade-insecure-requests
+  # - script-src / connect-src additionally allow Cloudflare Web Analytics
+  #   (privacy-friendly, cookieless). The beacon loads from
+  #   static.cloudflareinsights.com and reports to cloudflareinsights.com.
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; font-src 'self'; form-action 'self'; upgrade-insecure-requests
 
 # Hashed, immutable build assets can be cached forever
 /_astro/*
