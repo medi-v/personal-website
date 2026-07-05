@@ -10,3 +10,10 @@ dist/
 SergeyVoelkeCVJune.pdf
 file_000000001b3871f4b6335aea59d8dda6(1).png
 book cover.jpg
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
