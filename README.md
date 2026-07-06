@@ -8,7 +8,7 @@ writing (native posts plus links to my Medium and LinkedIn articles).
 
 ## Run it locally
 
-You need [Node.js](https://nodejs.org) (version 20.3+; this project is pinned to
+You need [Node.js](https://nodejs.org) (version 22.12+; this project is pinned to
 Node 22 via `.nvmrc`). Then, in this folder:
 
 ```bash
