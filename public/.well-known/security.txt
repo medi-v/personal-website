@@ -1,0 +1,7 @@
+# Security contact for sergeyvoelker.com (RFC 9116 standard location).
+# Please report vulnerabilities privately, not in public issues.
+# See also SECURITY.md in the GitHub repository: github.com/medi-v/personal-website
+Contact: https://www.linkedin.com/in/sergeyvoelker/
+Expires: 2027-07-01T00:00:00.000Z
+Preferred-Languages: en, de
+Canonical: https://sergeyvoelker.com/.well-known/security.txt
