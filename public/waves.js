@@ -190,23 +190,25 @@
   }
 
   /* ---------------- paper birds -------------------------------------------
-     Every so often a small sketched bird glides across the screen —
-     two ink strokes, drawn twice with a tiny offset so it feels
-     hand-drawn. At most two birds at a time. */
+     Every so often a small sketched bird flies across the screen. Each
+     wing swings through a wide arc (tips well above the body, then below)
+     so the flapping actually reads. Drawn twice with a small offset for a
+     hand-drawn, paper look. At most three birds at a time. */
   var birds = [];
-  var nextBirdAt = 3000; // first bird after ~3 seconds
+  var nextBirdAt = 2500; // first bird after ~2.5 seconds
 
   function spawnBird(now) {
     var goingRight = Math.random() < 0.5;
     var H = birdCanvas.clientHeight, W = birdCanvas.clientWidth;
     birds.push({
-      x: goingRight ? -40 : W + 40,
-      y: H * (0.12 + Math.random() * 0.5),      // upper half of the screen
-      vx: (goingRight ? 1 : -1) * (45 + Math.random() * 35), // px per second
-      size: 10 + Math.random() * 7,
+      x: goingRight ? -60 : W + 60,
+      y: H * (0.07 + Math.random() * 0.42),        // upper part of the screen
+      vx: (goingRight ? 1 : -1) * (55 + Math.random() * 45), // px per second
+      dir: goingRight ? 1 : -1,
+      size: 13 + Math.random() * 10,
       phase: Math.random() * Math.PI * 2,
-      flap: 4 + Math.random() * 2,               // wing speed
-      bob: 8 + Math.random() * 8,                // vertical drift
+      flapSpeed: 5.5 + Math.random() * 3.5,        // rad/s — clearly visible
+      bob: 5 + Math.random() * 8,                  // gentle vertical drift
       born: now,
     });
   }
@@ -216,40 +218,46 @@
     var W = birdCanvas.clientWidth, H = birdCanvas.clientHeight;
     ctx.clearRect(0, 0, W, H);
 
-    if (now > nextBirdAt && birds.length < 2) {
+    if (now > nextBirdAt && birds.length < 3) {
       spawnBird(now);
-      nextBirdAt = now + 9000 + Math.random() * 12000; // next in 9–21 s
+      nextBirdAt = now + 6000 + Math.random() * 9000; // next in 6–15 s
     }
 
-    birds = birds.filter(function (b) { return b.x > -60 && b.x < W + 60; });
+    birds = birds.filter(function (b) { return b.x > -80 && b.x < W + 80; });
+
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
 
     birds.forEach(function (b) {
       b.x += b.vx * dt;
       var t = (now - b.born) / 1000;
-      // glide, then a short flapping burst, then glide again
-      var flapEnvelope = Math.max(0, Math.sin(t * 0.7)) * 0.9 + 0.1;
-      var f = 0.18 + Math.sin(t * b.flap + b.phase) * 0.3 * flapEnvelope;
-      var y = b.y + Math.sin(t * 0.5 + b.phase) * b.bob;
+      var flap = Math.sin(t * b.flapSpeed + b.phase);   // -1 (down) .. 1 (up)
+      var y = b.y + Math.sin(t * 0.6 + b.phase) * b.bob;
       var s = b.size;
 
-      ctx.lineWidth = 1.1;
-      ctx.lineCap = 'round';
-      // two passes with a tiny offset = sketched-on-paper look
+      // Wingtips swing high above the body on the upstroke and dip below on
+      // the downstroke; the mid-wing (elbow) follows more softly.
+      var tipY = y - s * 0.8 * flap;
+      var elbowY = y - s * 0.3 * flap;
+      // A slight forward lean in the travel direction.
+      var lean = b.dir * s * 0.12;
+
       for (var pass = 0; pass < 2; pass++) {
-        var j = pass * 0.8; // jitter offset for the second stroke
-        ctx.strokeStyle = pass === 0
-          ? 'rgba(26, 25, 23, 0.40)'
-          : 'rgba(26, 25, 23, 0.18)';
+        var j = pass ? 0.9 : 0; // offset for the sketched second stroke
+        ctx.strokeStyle = pass ? 'rgba(26, 25, 23, 0.15)' : 'rgba(26, 25, 23, 0.42)';
+        ctx.lineWidth = pass ? 1.4 : 1.2;
         ctx.beginPath();
-        ctx.moveTo(b.x - s + j, y - s * f + j);
-        ctx.quadraticCurveTo(b.x - s * 0.4 + j, y + s * 0.18, b.x + j, y);
-        ctx.quadraticCurveTo(b.x + s * 0.4 + j, y + s * 0.18, b.x + s + j, y - s * f + j);
+        // left wingtip -> elbow -> body -> elbow -> right wingtip
+        ctx.moveTo(b.x - s + j, tipY + j);
+        ctx.quadraticCurveTo(b.x - s * 0.45 + j, elbowY + j, b.x + lean + j, y + j);
+        ctx.quadraticCurveTo(b.x + s * 0.45 + j, elbowY + j, b.x + s + j, tipY + j);
         ctx.stroke();
       }
     });
   }
 
-  /* ---------------- shared animation loop -------------------------------- */
+  /* ---------------- shared animation loop, with pause control ------------ */
+  var rafId = null;
   var lastT = 0;
   function frame(t) {
     var dt = lastT ? Math.min((t - lastT) / 1000, 0.05) : 0.016;
@@ -257,7 +265,40 @@
     if (visible.has(seaCanvas)) drawWater(seaCanvas, t, true);
     headSeas.forEach(function (c) { if (visible.has(c)) drawWater(c, t, false); });
     drawBirds(t, dt);
-    requestAnimationFrame(frame);
+    rafId = requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+  function startLoop() { if (rafId === null) { lastT = 0; rafId = requestAnimationFrame(frame); } }
+  function stopLoop() {
+    if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+    var bctx = birdCanvas.getContext('2d');
+    bctx.clearRect(0, 0, birdCanvas.clientWidth, birdCanvas.clientHeight);
+  }
+  function drawStill() {
+    // A single frozen frame so the water composition is still there.
+    drawWater(seaCanvas, 40000, true);
+    headSeas.forEach(function (c) { drawWater(c, 40000, false); });
+  }
+
+  // Pause / play button. The preference is remembered across visits.
+  var motionBtn = document.getElementById('motiontoggle');
+  var paused = localStorage.getItem('waves-motion') === 'off';
+
+  function applyMotion() {
+    if (paused) {
+      stopLoop();
+      drawStill();
+      motionBtn.textContent = '► Play motion';
+      motionBtn.setAttribute('aria-pressed', 'true');
+    } else {
+      startLoop();
+      motionBtn.textContent = '❚❚ Pause motion';
+      motionBtn.setAttribute('aria-pressed', 'false');
+    }
+  }
+  motionBtn.addEventListener('click', function () {
+    paused = !paused;
+    try { localStorage.setItem('waves-motion', paused ? 'off' : 'on'); } catch (e) {}
+    applyMotion();
+  });
+  applyMotion();
 })();
