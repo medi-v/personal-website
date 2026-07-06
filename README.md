@@ -1,5 +1,7 @@
 # Sergey Völker — personal website
 
+[![CI](https://github.com/medi-v/personal-website/actions/workflows/ci.yml/badge.svg)](https://github.com/medi-v/personal-website/actions/workflows/ci.yml)
+
 A small, fast, static personal site built with [Astro](https://astro.build) and
 [Tailwind CSS](https://tailwindcss.com). It introduces me and collects my
 writing (native posts plus links to my Medium and LinkedIn articles).
@@ -121,4 +123,5 @@ Run through this before every push to `main` (pushing deploys the live site):
 
 The **source code** is MIT-licensed (see `LICENSE`). The **written content**
 (blog posts, book description, biographical text, images, name) is
-© 2026 Sergey Völker, all rights reserved — please don't reuse it.
+© 2026 Sergey Völker, all rights reserved — please don't reuse it
+(see `NOTICE`).

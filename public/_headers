@@ -12,6 +12,9 @@
   Permissions-Policy: geolocation=(), microphone=(), camera=(), browsing-topics=()
   # Force HTTPS for two years (only takes effect once served over HTTPS)
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  # Isolate this site's windows from pages it opens/that open it
+  # (defense-in-depth on top of rel="noopener" on external links)
+  Cross-Origin-Opener-Policy: same-origin
   # Content Security Policy.
   # - script-src 'self': no inline JS (the blog filter is an external, hashed
   #   Astro bundle; the JSON-LD block is data, not executed).
