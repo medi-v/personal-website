@@ -8,53 +8,41 @@ writing (native posts plus links to my Medium and LinkedIn articles).
 
 ## How this site works
 
-I'm a program manager, not a developer by trade — so I built this deliberately
-simple and safe rather than clever. A few decisions are worth calling out,
-because they're the reason the site is cheap to run, hard to break, and safe to
-open-source.
+I'm a program manager, not a developer. So I built this deliberately
+simple and safe. A few decisions are mentioning.
 
-**Static by design — nothing to attack.** Astro turns the whole site into plain
+**Static design.** Astro turns the whole site into plain
 HTML, CSS, and JavaScript files at build time. There is no server running the
 site, no database, and no logins or forms that submit anywhere. That removes
 entire categories of risk at the source: there is simply nothing there to hack.
 Cloudflare Pages serves the finished files from its global network, so pages
 load fast and hosting is free.
 
-**Security that doesn't depend on secrecy.** The site is designed to stay safe
-even though every line of it is public. A strict [Content Security Policy](public/_headers)
+**Security.** The site is designed to stay safe even though every line of it is public. 
+A strict [Content Security Policy](public/_headers)
 tells the browser to run *no inline scripts at all* — so even if some bad text
-ever slipped onto a page, the browser wouldn't execute it. The little bits of
-JavaScript the site does use (the blog filter, the animation on `/waves`) each
+ever slipped onto a page, the browser wouldn't execute it. The used JavaScript the site 
+does use (the blog filter, the animation on `/waves`) each
 live as their own file in `public/`, which keeps that policy strict. On top of
 that come the usual protective headers (HSTS, `X-Frame-Options`, COOP,
 `X-Content-Type-Options`), all defined in one readable [`public/_headers`](public/_headers)
 file.
 
-**Private details never touch the code.** German law requires a legal notice
-(*Impressum*) showing a real address and email — exactly the kind of thing you
-don't want sitting in a public repository. The [Impressum page](src/pages/impressum.astro)
-reads those values from environment variables at build time: the real ones live
-in a git-ignored `.env` file locally and in the Cloudflare dashboard in
-production. If they're missing, the page shows clearly-marked `[placeholders]`
-instead. So the source is safe to publish, while the live page still shows what
-the law requires.
-
-**Guardrails so a mistake can't quietly ship.** Every push runs a
-[GitHub Actions workflow](.github/workflows/ci.yml) that rebuilds the site — if a
+**Guardrails.** Every push runs a 
+[GitHub Actions workflow](.github/workflows/ci.yml) that rebuilds the site. If a
 blog post has broken formatting or a link between pages is wrong, the build fails
 there, before it can reach visitors. It also checks internal links and runs with
 read-only permissions (least privilege). [Dependabot](.github/dependabot.yml)
 watches the project's dependencies and opens a pull request when a security
 update is available. The [pre-deployment checklist](#pre-deployment-checklist)
-below is the human half of the same idea.
+below is the additional quality gate. 
 
-**Fast and private for readers.** Fonts are self-hosted (no Google Fonts, no
+**Fast and private.** Fonts are self-hosted (no Google Fonts, no
 third-party tracking), images are kept small, and JavaScript loads only on the
 pages that actually use it. Analytics, where used, are cookieless.
 
 If you want the deeper reasoning behind any of this, the code is heavily
-commented — each file explains *why* it's built the way it is, not just what it
-does.
+commented (thanks, Claude!). Each file explains *why* it's built the way it is.
 
 ## Run it locally
 
@@ -168,16 +156,6 @@ Run through this before every push to `main` (pushing deploys the live site):
    narrow (mobile) window.
 5. **Manual test:** `npm run preview` after the build, click through the
    changed pages once — including one blog post and the 404 page.
-
-## After deploying (1 minute)
-
-1. Open the changed pages once on the live site.
-2. If headers or files in `public/` changed, confirm they actually arrived,
-   e.g. `curl -I https://sergeyvoelker.com/` for headers.
-3. CI on GitHub should be green. Note: Cloudflare deploys on every push to
-   `main` **even if CI fails** — a red CI still needs a follow-up fix.
-4. If a dashboard setting changed (Cloudflare, GitHub), verify the *result*
-   on the live site — a saved setting is not proof it works.
 
 ## Maintenance rhythm
 
