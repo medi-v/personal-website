@@ -3,21 +3,31 @@
 // Policy allows only external same-origin scripts, no inline ones
 // (same pattern as blog-filter.js).
 //
-// Everything here is decoration: the page is fully readable without it.
+// Everything here is decoration: without JavaScript the page is fully
+// readable (reveal states only activate once the `.anim` class below is
+// added). Deliberately ignores the OS `prefers-reduced-motion` flag —
+// Windows often sets it via "Animation effects" and froze the page for
+// the site owner; the motion here is slow and decorative.
 (function () {
   'use strict';
 
-  var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var bleed = document.querySelector('.bleed');
+  var seaCanvas = document.getElementById('sea');
+  if (!bleed || !seaCanvas) return; // not on the waves page
+
+  // Arms the CSS reveal states (see waves.astro). Must happen first.
+  bleed.classList.add('anim');
 
   /* ---------------- thread geometry: build the S-curve paths ------------- */
   var rails = Array.prototype.slice.call(document.querySelectorAll('.rail'));
-  if (rails.length === 0) return; // not on the waves page
 
   function buildPaths() {
     rails.forEach(function (rail) {
       var svgEl = rail.querySelector('.flow');
       var h = rail.offsetHeight;
-      var w = 120, mid = w / 2, amp = 34, step = 240;
+      // amp is kept small so the curve never touches the item dots,
+      // which sit 24px from the centre line.
+      var w = 120, mid = w / 2, amp = 14, step = 240;
       svgEl.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
       var d = 'M ' + mid + ' 0';
       var side = 1;
@@ -79,20 +89,13 @@
     });
   }
 
-  if (reduceMotion) {
-    rails.forEach(function (rail) { rail._drawn.style.strokeDashoffset = '0'; });
-    addEventListener('scroll', function () {
-      wavenav.classList.toggle('show', scrollY > innerHeight * 0.8);
-    }, { passive: true });
-  } else {
-    var ticking = false;
-    addEventListener('scroll', function () {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(function () { onScroll(); ticking = false; });
-    }, { passive: true });
-    onScroll();
-  }
+  var ticking = false;
+  addEventListener('scroll', function () {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () { onScroll(); ticking = false; });
+  }, { passive: true });
+  onScroll();
 
   /* ---------------- reveal-on-arrival ------------------------------------
      Wave headings fire a bit later (rootMargin) so the word-by-word
@@ -105,13 +108,13 @@
     }, options);
     document.querySelectorAll(selector).forEach(function (el) { io.observe(el); });
   }
-  reveal('.item, .interlude', { threshold: 0.15 });
+  reveal('.item', { threshold: 0.15 });
   reveal('.wave-head', { rootMargin: '0px 0px -18% 0px' });
 
   /* ---------------- the water --------------------------------------------
-     One shared animation loop drives the hero sea and the faint ambient
-     water behind each wave heading. Canvases only draw while on screen. */
-  var seaCanvas = document.getElementById('sea');
+     One shared animation loop drives the hero sea, the faint ambient water
+     behind each wave heading, and the paper birds. Water canvases only
+     draw while they are on screen. */
   var headSeas = Array.prototype.slice.call(document.querySelectorAll('.headsea'));
   var visible = new WeakSet();
   var visIO = new IntersectionObserver(function (entries) {
@@ -128,12 +131,14 @@
   });
   seaCanvas.parentElement.addEventListener('pointerleave', function () { mouse.on = false; });
 
+  var birdCanvas = document.getElementById('birds');
+
   function sizeCanvas(c) {
     c.width = c.clientWidth * devicePixelRatio;
     c.height = c.clientHeight * devicePixelRatio;
     c.getContext('2d').setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
   }
-  function sizeAll() { [seaCanvas].concat(headSeas).forEach(sizeCanvas); }
+  function sizeAll() { [seaCanvas, birdCanvas].concat(headSeas).forEach(sizeCanvas); }
   sizeAll();
   addEventListener('resize', sizeAll);
 
@@ -184,16 +189,75 @@
     }
   }
 
+  /* ---------------- paper birds -------------------------------------------
+     Every so often a small sketched bird glides across the screen —
+     two ink strokes, drawn twice with a tiny offset so it feels
+     hand-drawn. At most two birds at a time. */
+  var birds = [];
+  var nextBirdAt = 3000; // first bird after ~3 seconds
+
+  function spawnBird(now) {
+    var goingRight = Math.random() < 0.5;
+    var H = birdCanvas.clientHeight, W = birdCanvas.clientWidth;
+    birds.push({
+      x: goingRight ? -40 : W + 40,
+      y: H * (0.12 + Math.random() * 0.5),      // upper half of the screen
+      vx: (goingRight ? 1 : -1) * (45 + Math.random() * 35), // px per second
+      size: 10 + Math.random() * 7,
+      phase: Math.random() * Math.PI * 2,
+      flap: 4 + Math.random() * 2,               // wing speed
+      bob: 8 + Math.random() * 8,                // vertical drift
+      born: now,
+    });
+  }
+
+  function drawBirds(now, dt) {
+    var ctx = birdCanvas.getContext('2d');
+    var W = birdCanvas.clientWidth, H = birdCanvas.clientHeight;
+    ctx.clearRect(0, 0, W, H);
+
+    if (now > nextBirdAt && birds.length < 2) {
+      spawnBird(now);
+      nextBirdAt = now + 9000 + Math.random() * 12000; // next in 9–21 s
+    }
+
+    birds = birds.filter(function (b) { return b.x > -60 && b.x < W + 60; });
+
+    birds.forEach(function (b) {
+      b.x += b.vx * dt;
+      var t = (now - b.born) / 1000;
+      // glide, then a short flapping burst, then glide again
+      var flapEnvelope = Math.max(0, Math.sin(t * 0.7)) * 0.9 + 0.1;
+      var f = 0.18 + Math.sin(t * b.flap + b.phase) * 0.3 * flapEnvelope;
+      var y = b.y + Math.sin(t * 0.5 + b.phase) * b.bob;
+      var s = b.size;
+
+      ctx.lineWidth = 1.1;
+      ctx.lineCap = 'round';
+      // two passes with a tiny offset = sketched-on-paper look
+      for (var pass = 0; pass < 2; pass++) {
+        var j = pass * 0.8; // jitter offset for the second stroke
+        ctx.strokeStyle = pass === 0
+          ? 'rgba(26, 25, 23, 0.40)'
+          : 'rgba(26, 25, 23, 0.18)';
+        ctx.beginPath();
+        ctx.moveTo(b.x - s + j, y - s * f + j);
+        ctx.quadraticCurveTo(b.x - s * 0.4 + j, y + s * 0.18, b.x + j, y);
+        ctx.quadraticCurveTo(b.x + s * 0.4 + j, y + s * 0.18, b.x + s + j, y - s * f + j);
+        ctx.stroke();
+      }
+    });
+  }
+
+  /* ---------------- shared animation loop -------------------------------- */
+  var lastT = 0;
   function frame(t) {
+    var dt = lastT ? Math.min((t - lastT) / 1000, 0.05) : 0.016;
+    lastT = t;
     if (visible.has(seaCanvas)) drawWater(seaCanvas, t, true);
     headSeas.forEach(function (c) { if (visible.has(c)) drawWater(c, t, false); });
+    drawBirds(t, dt);
     requestAnimationFrame(frame);
   }
-  if (reduceMotion) {
-    // One still frame so the composition is there, without motion.
-    drawWater(seaCanvas, 40000, true);
-    headSeas.forEach(function (c) { drawWater(c, 40000, false); });
-  } else {
-    requestAnimationFrame(frame);
-  }
+  requestAnimationFrame(frame);
 })();

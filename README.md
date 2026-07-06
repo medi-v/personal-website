@@ -110,8 +110,10 @@ Run through this before every push to `main` (pushing deploys the live site):
    update automatically at build time — but confirm the new page appears in
    `dist/sitemap-*.xml` after the build.
 4. **Accessibility & health:** keyboard focus visible, images have `alt`,
-   animations respect `prefers-reduced-motion`, page works on a narrow
-   (mobile) window.
+   animations respect `prefers-reduced-motion` where feasible (deliberate
+   exception: the decorative water/birds on `/waves` — Windows often sets
+   that flag system-wide and would freeze the page), page works on a
+   narrow (mobile) window.
 5. **Manual test:** `npm run preview` after the build, click through the
    changed pages once — including one blog post and the 404 page.
 
