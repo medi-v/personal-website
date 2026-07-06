@@ -119,6 +119,26 @@ Run through this before every push to `main` (pushing deploys the live site):
 5. **Manual test:** `npm run preview` after the build, click through the
    changed pages once — including one blog post and the 404 page.
 
+## After deploying (1 minute)
+
+1. Open the changed pages once on the live site.
+2. If headers or files in `public/` changed, confirm they actually arrived,
+   e.g. `curl -I https://sergeyvoelker.com/` for headers.
+3. CI on GitHub should be green. Note: Cloudflare deploys on every push to
+   `main` **even if CI fails** — a red CI still needs a follow-up fix.
+4. If a dashboard setting changed (Cloudflare, GitHub), verify the *result*
+   on the live site — a saved setting is not proof it works.
+
+## Maintenance rhythm
+
+- **Weekly:** review Dependabot PRs. Routine bumps (GitHub Actions) can be
+  merged when CI is green; framework major upgrades get tested on a branch
+  first (build + preview + spot checks). Never merge a bot PR without
+  reading its diff — bots sometimes propose architecture changes.
+- **Monthly:** run `npm audit`; click through the live site once.
+- **Yearly:** renew the `Expires:` date in
+  `public/.well-known/security.txt` (currently set to July 2027).
+
 ## License
 
 The **source code** is MIT-licensed (see `LICENSE`). The **written content**
