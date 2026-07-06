@@ -24,8 +24,11 @@ const { title, description, type = 'website', image = '/og.jpg', structuredData 
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const imageUrl = new URL(image, Astro.site);
 
-// On the home page the header links to the blog; everywhere else it leads back home.
-const isHome = Astro.url.pathname === '/';
+// Header navigation: show links to the sections you are NOT currently on.
+const path = Astro.url.pathname;
+const isHome = path === '/';
+const onBlog = path.startsWith('/blog');
+const onWaves = path.startsWith('/waves');
 
 // Structured data: tells Google who this site is about (helps rich results).
 const personSchema = {
@@ -110,18 +113,16 @@ const personSchema = {
 
     <div class="mx-auto max-w-3xl px-6">
       <header class="flex justify-end pt-10 pb-4">
-        <nav class="font-sans text-sm" aria-label="Main">
-          {
-            isHome ? (
-              <a href="/blog" class="text-muted hover:text-clay-text">
-                Blog&nbsp;→
-              </a>
-            ) : (
-              <a href="/" class="text-muted hover:text-clay-text">
-                ←&nbsp;Home
-              </a>
-            )
-          }
+        <nav class="flex gap-5 font-sans text-sm" aria-label="Main">
+          {!isHome && (
+            <a href="/" class="text-muted hover:text-clay-text">←&nbsp;Home</a>
+          )}
+          {!onWaves && (
+            <a href="/waves" class="text-muted hover:text-clay-text">Waves{isHome && ' →'}</a>
+          )}
+          {!onBlog && (
+            <a href="/blog" class="text-muted hover:text-clay-text">Blog{isHome && ' →'}</a>
+          )}
         </nav>
       </header>
 
