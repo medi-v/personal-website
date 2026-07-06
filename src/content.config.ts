@@ -21,4 +21,26 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+// The "waves" collection: the curated pieces shown on /waves.
+// One .md file per piece; the visible text lives in the frontmatter.
+const waves = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/waves' }),
+  schema: z.object({
+    title: z.string(),
+    // What kind of piece it is — shown as the small label, e.g.
+    // "Essay", "Talk", "Speech", "Documentary", "Short film", "Film"
+    kind: z.string(),
+    // Author / source line, e.g. "Mark Manson" or "Ethan Hawke · TED"
+    by: z.string(),
+    // Link to the original piece
+    url: z.string().url(),
+    // Which wave (section) it belongs to: 1–4 (see WAVE_META in waves.astro)
+    wave: z.number().int().min(1).max(4),
+    // Position inside its wave (1 = first)
+    order: z.number(),
+    // 2–3 line neutral summary of what the piece is about
+    summary: z.string(),
+  }),
+});
+
+export const collections = { blog, waves };

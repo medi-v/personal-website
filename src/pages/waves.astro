@@ -1,0 +1,399 @@
+---
+// The "Waves" page: a curated collection of essays, talks and films,
+// presented as four themed "waves" flowing down one page.
+//
+// How it works:
+// - Every piece is a Markdown file in src/content/waves/ (see README).
+// - The four wave sections (names, intros, quotes) are defined in
+//   WAVE_META below. To add a fifth wave, add an entry here and use
+//   `wave: 5` in the new pieces (also raise the max in content.config.ts).
+// - All content is rendered on the server (good for search engines);
+//   the script at the bottom only adds the animations.
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+// The four sections. Roman numeral + short label appear in the navigation.
+const WAVE_META = [
+  {
+    num: 1, roman: 'I', label: 'Attention', name: 'On attention & presence',
+    intro: 'It starts with noticing. Everything else is downstream of what you choose to pay attention to.',
+    quote: 'The most obvious, important realities are often the ones that are hardest to see and talk about.',
+    who: 'David Foster Wallace',
+  },
+  {
+    num: 2, roman: 'II', label: 'Creativity', name: 'On creativity & craft',
+    intro: 'Once you can see clearly, you can make things. Where ideas come from — and who is allowed to have them.',
+    quote: "The greatest originals are the ones who fail the most, because they're the ones who try the most.",
+    who: 'Adam Grant',
+  },
+  {
+    num: 3, roman: 'III', label: 'Wanting less', name: 'On wanting less',
+    intro: 'Making things means saying no to almost everything else. The weight you put down on purpose.',
+    quote: "Who you are is defined by what you're willing to struggle for.",
+    who: 'Mark Manson',
+  },
+  {
+    num: 4, roman: 'IV', label: 'Becoming', name: 'On becoming yourself',
+    intro: 'The last wave points inward: how people grow, what holds them steady, and how to keep learning for a whole life.',
+    quote: 'Impatience with actions, patience with results.',
+    who: 'Naval Ravikant',
+  },
+];
+
+// Load all pieces and group them into their waves, in order.
+const entries = await getCollection('waves');
+const wavesData = WAVE_META.map((meta) => ({
+  ...meta,
+  items: entries
+    .filter((e) => e.data.wave === meta.num)
+    .sort((a, b) => a.data.order - b.data.order),
+}));
+
+// Structured data: tell search engines this page is a curated list.
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Waves — curated essays, talks and films',
+  description: 'A curated collection of essays, talks and films on attention, creativity, wanting less, and becoming yourself.',
+  itemListElement: wavesData.flatMap((w) => w.items).map((e, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: e.data.title,
+    url: e.data.url,
+  })),
+};
+---
+
+<Base
+  title="Waves — Curated Essays, Talks & Films | Sergey Völker"
+  description="Waves: a curated collection of essays, talks and films Sergey Völker keeps returning to — on attention, creativity, wanting less, and becoming yourself."
+  structuredData={[itemListSchema]}
+>
+  <div class="bleed">
+    <!-- ============ HERO: the living wave field ============ -->
+    <section class="hero">
+      <canvas id="sea" aria-hidden="true"></canvas>
+      <div class="veil">
+        <h1 class="font-serif">Wa<em>v</em>es</h1>
+        <p class="sub">Curated essays, talks, and videos.</p>
+        <nav class="jump font-sans" aria-label="Jump to a wave">
+          {WAVE_META.map((w) => (
+            <a href={`#wave-${w.num}`}>{w.roman} · {w.label}</a>
+          ))}
+        </nav>
+      </div>
+      <span class="down font-sans" aria-hidden="true">↓ dive in</span>
+    </section>
+
+    <!-- ============ sticky wave navigation ============ -->
+    <nav class="wavenav font-sans" id="wavenav" aria-label="Waves sections">
+      <div class="row">
+        {WAVE_META.map((w) => (
+          <a href={`#wave-${w.num}`} data-w={`wave-${w.num}`}>{w.roman} · {w.label}</a>
+        ))}
+        <a href="#main" class="surface">↑ Surface</a>
+      </div>
+      <div class="progress" id="progress"></div>
+    </nav>
+
+    <!-- ============ the four waves ============ -->
+    {wavesData.map((w) => (
+      <section class="wave" id={`wave-${w.num}`}>
+        <div class="interlude">
+          <blockquote>
+            “{w.quote}”
+            <span class="who font-sans">{w.who}</span>
+          </blockquote>
+        </div>
+
+        <div class="wave-head">
+          <canvas class="headsea" aria-hidden="true"></canvas>
+          <div class="head-inner">
+            <span class="no font-sans">Wave {w.roman} · {w.items.length} pieces</span>
+            <h2>
+              {w.name.split(' ').map((word, i) => (
+                <span class="w" style={`--i:${i}`}>{word}</span>
+              ))}
+            </h2>
+            <svg class="underline" width="140" height="14" viewBox="0 0 140 14" aria-hidden="true">
+              <path pathLength="1" d="M0 7 Q 17.5 0, 35 7 T 70 7 T 105 7 T 140 7"></path>
+            </svg>
+            <p class="intro">{w.intro}</p>
+          </div>
+        </div>
+
+        <div class="rail">
+          <svg class="flow" preserveAspectRatio="none" aria-hidden="true">
+            <path class="trace"></path>
+            <path class="drawn-path" pathLength="1"></path>
+            <circle class="droplet" r="4.5"></circle>
+          </svg>
+          {w.items.map((e) => (
+            <div class="item">
+              <span class="kind font-sans">{e.data.kind}</span>
+              <h3><a href={e.data.url} target="_blank" rel="noopener">{e.data.title}</a></h3>
+              <p class="by font-sans">{e.data.by}</p>
+              <p class="sum">{e.data.summary}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <!-- ============ closing ============ -->
+    <div class="endnote">
+      <svg width="120" height="18" viewBox="0 0 120 18" aria-hidden="true">
+        <path d="M0 9 Q 15 0, 30 9 T 60 9 T 90 9 T 120 9"></path>
+      </svg>
+      <p>The collection grows.</p>
+      <a class="top font-sans" href="#main">↑ Back to the surface</a>
+    </div>
+  </div>
+</Base>
+
+<style>
+  /* Break out of the layout's centered column to use the full window width. */
+  .bleed { width: 100vw; margin-left: calc(50% - 50vw); }
+
+  /* ---------- HERO ---------- */
+  .hero { position: relative; height: 86vh; min-height: 540px; }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .veil {
+    position: relative; z-index: 5; height: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 0 1.4rem;
+    pointer-events: none;
+  }
+  .hero h1 {
+    font-weight: 400; font-size: clamp(3.2rem, 10vw, 6.2rem);
+    letter-spacing: .02em; margin: 0 0 .9rem; line-height: 1.02;
+  }
+  .hero h1 em { font-style: italic; color: var(--color-clay-text); }
+  .hero .sub {
+    font-size: clamp(1rem, 2vw, 1.15rem); color: var(--color-muted);
+    max-width: 33rem; margin: 0;
+  }
+  .jump {
+    pointer-events: auto; margin-top: 2.4rem;
+    display: flex; gap: .55rem; flex-wrap: wrap; justify-content: center;
+  }
+  .jump a {
+    font-size: .74rem; letter-spacing: .1em; text-transform: uppercase;
+    text-decoration: none; color: var(--color-muted);
+    border: 1px solid var(--color-line); border-radius: 9999px;
+    padding: .45rem 1rem; transition: color .25s, border-color .25s;
+  }
+  .jump a:hover { color: var(--color-clay-text); border-color: var(--color-clay); }
+  .down {
+    position: absolute; bottom: 1.6rem; left: 50%; transform: translateX(-50%);
+    font-size: .72rem; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--color-clay-text);
+    animation: bob 2.8s ease-in-out infinite;
+  }
+  @keyframes bob {
+    0%, 100% { transform: translate(-50%, 0); }
+    50% { transform: translate(-50%, 7px); }
+  }
+
+  /* ---------- sticky wave nav ---------- */
+  .wavenav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    background: color-mix(in srgb, var(--color-paper) 92%, transparent);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--color-line);
+    transform: translateY(-100%);
+    transition: transform .4s cubic-bezier(.22, 1, .36, 1);
+  }
+  .wavenav.show { transform: none; }
+  .wavenav .row {
+    display: flex; align-items: center; gap: .3rem;
+    max-width: 62rem; margin: 0 auto; padding: 0 1rem;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .wavenav .row::-webkit-scrollbar { display: none; }
+  .wavenav a {
+    font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+    text-decoration: none; color: var(--color-muted);
+    padding: .85rem .8rem; white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color .25s, border-color .25s;
+  }
+  .wavenav a:hover { color: var(--color-ink); }
+  .wavenav a.here { color: var(--color-clay-text); border-bottom-color: var(--color-clay); }
+  .wavenav a.surface { margin-left: auto; color: var(--color-clay-text); }
+  .wavenav .progress {
+    position: absolute; left: 0; bottom: -1px; height: 2px;
+    background: var(--color-clay); width: 0;
+  }
+
+  /* ---------- quote interludes ---------- */
+  .interlude { padding: 9vh 1.4rem 7vh; text-align: center; max-width: 50rem; margin: 0 auto; }
+  .interlude blockquote {
+    margin: 0; font-style: italic; font-weight: 400;
+    font-size: clamp(1.35rem, 3.2vw, 2.1rem); line-height: 1.35;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s cubic-bezier(.22, 1, .36, 1);
+  }
+  .interlude.seen blockquote { opacity: 1; transform: none; }
+  .who {
+    display: block; margin-top: 1.3rem; font-style: normal;
+    font-size: .76rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--color-muted);
+    opacity: 0; transition: opacity 1s ease .35s;
+  }
+  .interlude.seen .who { opacity: 1; }
+  .who::before { content: "— "; color: var(--color-clay); }
+
+  /* ---------- wave heading, with ambient water behind it ---------- */
+  .wave { scroll-margin-top: 3.2rem; }
+  .wave-head { position: relative; margin: 0 auto 3rem; text-align: center; }
+  .headsea {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .head-inner {
+    position: relative; z-index: 1;
+    max-width: 44rem; margin: 0 auto; padding: 2.6rem 1.4rem 2.2rem;
+  }
+  .no {
+    font-size: .72rem; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--color-clay-text); display: block; margin-bottom: .8rem;
+    opacity: 0; transition: opacity .9s ease;
+  }
+  .wave-head.seen .no { opacity: 1; }
+  .wave-head h2 {
+    font-weight: 400; font-size: clamp(1.9rem, 4.2vw, 2.7rem);
+    line-height: 1.2; margin: 0 0 .4rem;
+  }
+  /* Arrival moment: each word of the title rises out of the water. */
+  .wave-head h2 .w {
+    display: inline-block; opacity: 0;
+    transform: translateY(1.1em);
+    transition: opacity .9s ease, transform 1s cubic-bezier(.22, 1, .36, 1);
+    transition-delay: calc(var(--i) * .14s);
+    margin-right: .28em;
+  }
+  .wave-head h2 .w:last-child { margin-right: 0; }
+  .wave-head.seen h2 .w { opacity: 1; transform: none; }
+  /* …then a small clay wave draws itself under the title. */
+  .underline { display: block; margin: .5rem auto .9rem; overflow: visible; }
+  .underline path {
+    fill: none; stroke: var(--color-clay); stroke-width: 1.8;
+    stroke-dasharray: 1; stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1.3s cubic-bezier(.22, 1, .36, 1) .7s;
+  }
+  .wave-head.seen .underline path { stroke-dashoffset: 0; }
+  .intro {
+    color: var(--color-muted); margin: 0 auto; font-size: .98rem; max-width: 30rem;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity .9s ease .85s, transform .9s ease .85s;
+  }
+  .wave-head.seen .intro { opacity: 1; transform: none; }
+
+  /* ---------- the rail: thread + droplet + items ---------- */
+  .rail { position: relative; max-width: 62rem; margin: 0 auto; padding-bottom: 1rem; }
+  .rail .flow {
+    position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    height: 100%; width: 120px; overflow: visible; pointer-events: none;
+  }
+  .trace { fill: none; stroke: var(--color-line); stroke-width: 1.5; }
+  .drawn-path {
+    fill: none; stroke: var(--color-clay); stroke-width: 1.5;
+    stroke-dasharray: 1; stroke-dashoffset: 1;
+  }
+  .droplet {
+    fill: var(--color-clay); opacity: 0;
+    filter: drop-shadow(0 0 6px rgba(193, 95, 60, .5));
+  }
+
+  .item {
+    position: relative; width: calc(50% - 66px);
+    padding: 0 1.4rem; margin-bottom: 2.3rem;
+    opacity: 0; transform: translateY(18px);
+    transition: opacity .8s ease, transform .8s cubic-bezier(.22, 1, .36, 1);
+  }
+  .item.seen { opacity: 1; transform: none; }
+  .item:nth-child(odd) { margin-left: 0; text-align: right; }
+  .item:nth-child(even) { margin-left: calc(50% + 66px); text-align: left; }
+
+  /* node dot on the thread + a ripple ring when the item surfaces */
+  .item::after {
+    content: ""; position: absolute; top: .6rem;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--color-paper); border: 2px solid var(--color-clay);
+    transition: background .3s;
+  }
+  .item::before {
+    content: ""; position: absolute; top: calc(.6rem - 9px);
+    width: 31px; height: 31px; border-radius: 50%;
+    border: 1px solid var(--color-clay); opacity: 0; transform: scale(.3);
+    pointer-events: none;
+  }
+  .item.seen::before { animation: ripple 1.1s ease-out .15s; }
+  @keyframes ripple {
+    0%   { opacity: .7; transform: scale(.3); }
+    100% { opacity: 0;  transform: scale(1.4); }
+  }
+  .item:nth-child(odd)::after   { right: -42px; }
+  .item:nth-child(odd)::before  { right: -53px; }
+  .item:nth-child(even)::after  { left: -42px; }
+  .item:nth-child(even)::before { left: -53px; }
+  .item:hover::after { background: var(--color-clay); }
+
+  .kind {
+    font-size: .66rem; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--color-clay-text); display: block; margin-bottom: .35rem;
+  }
+  .item h3 { font-weight: 500; font-size: 1.2rem; line-height: 1.32; margin: 0 0 .2rem; }
+  /* Unmistakably a link: clay underline + arrow, darkens on hover. */
+  .item h3 a {
+    text-decoration: underline;
+    text-decoration-color: rgba(193, 95, 60, .45);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition: color .25s, text-decoration-color .25s;
+  }
+  .item h3 a::after { content: " ↗"; font-size: .75em; color: var(--color-clay-text); }
+  .item h3 a:hover { color: var(--color-clay-text); text-decoration-color: var(--color-clay); }
+  .by { font-size: .76rem; color: var(--color-muted); margin: 0 0 .5rem; }
+  .sum { font-size: .92rem; color: #4a4740; margin: 0; line-height: 1.55; }
+
+  /* ---------- closing ---------- */
+  .endnote { text-align: center; padding: 7vh 1.4rem 4vh; color: var(--color-muted); }
+  .endnote svg { display: block; margin: 0 auto 1.6rem; }
+  .endnote svg path { stroke: var(--color-clay); fill: none; stroke-width: 1.5; opacity: .6; }
+  .endnote p { margin: 0; }
+  .endnote .top {
+    display: inline-block; margin-top: 1.4rem;
+    font-size: .74rem; letter-spacing: .18em; text-transform: uppercase;
+    text-decoration: none; color: var(--color-clay-text);
+    border: 1px solid var(--color-line); border-radius: 9999px; padding: .5rem 1.2rem;
+    transition: border-color .25s;
+  }
+  .endnote .top:hover { border-color: var(--color-clay); }
+
+  /* ---------- mobile: thread moves to the left edge ---------- */
+  @media (max-width: 700px) {
+    .rail .flow { left: 26px; transform: none; width: 40px; }
+    .item, .item:nth-child(odd), .item:nth-child(even) {
+      width: auto; margin-left: 62px; margin-right: .6rem; text-align: left;
+    }
+    .item:nth-child(odd)::after,  .item:nth-child(even)::after  { left: -42px; right: auto; }
+    .item:nth-child(odd)::before, .item:nth-child(even)::before { left: -53px; right: auto; }
+    .jump a { padding: .4rem .8rem; }
+  }
+
+  /* ---------- reduced motion: everything visible, nothing moves ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .item, .interlude blockquote, .who,
+    .no, .wave-head h2 .w, .intro { opacity: 1; transform: none; transition: none; }
+    .underline path { stroke-dashoffset: 0; transition: none; }
+    .down { animation: none; }
+    .item.seen::before { animation: none; }
+  }
+</style>
+
+<!-- Animations live in an external file (public/waves.js) because the
+     Content-Security-Policy blocks inline scripts. Same pattern as the
+     blog filter. The page works fully without JavaScript. -->
+<script is:inline src="/waves.js" defer></script>
