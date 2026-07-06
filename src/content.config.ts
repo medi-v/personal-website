@@ -32,10 +32,11 @@ const waves = defineCollection({
     kind: z.string(),
     // Author / source line, e.g. "Mark Manson" or "Ethan Hawke · TED"
     by: z.string(),
-    // Link to the original piece
-    url: z.string().url(),
-    // Which wave (section) it belongs to: 1–4 (see WAVE_META in waves.astro)
-    wave: z.number().int().min(1).max(4),
+    // Link to the original piece. Optional: books have no link and are
+    // shown as plain titles.
+    url: z.string().url().optional(),
+    // Which wave (section) it belongs to: 1–6 (see WAVE_META in waves.astro)
+    wave: z.number().int().min(1).max(6),
     // Position inside its wave (1 = first)
     order: z.number(),
     // 2–3 line neutral summary of what the piece is about
