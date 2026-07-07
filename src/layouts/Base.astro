@@ -4,7 +4,7 @@ import '../styles/global.css';
 // Newsreader font, self-hosted (no Google Fonts, no tracking)
 import '@fontsource-variable/newsreader';
 import '@fontsource-variable/newsreader/wght-italic.css';
-import { LINKEDIN_URL, PROFILE_URLS, GOOGLE_SITE_VERIFICATION, BING_SITE_VERIFICATION } from '../consts';
+import { LINKEDIN_URL, GITHUB_URL, PROFILE_URLS, GOOGLE_SITE_VERIFICATION, BING_SITE_VERIFICATION } from '../consts';
 
 interface Props {
   title: string;
@@ -142,6 +142,7 @@ const personSchema = {
           </a>
           <p class="font-sans text-xs text-muted">
             © {new Date().getFullYear()} Sergey Völker ·
+            <a href={GITHUB_URL} target="_blank" rel="noopener" class="hover:text-clay-text">GitHub</a> ·
             <a href="/impressum" class="hover:text-clay-text">Impressum</a> ·
             <a href="/privacy" class="hover:text-clay-text">Privacy</a> ·
             <a href="/rss.xml" class="hover:text-clay-text">RSS</a>

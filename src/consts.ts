@@ -7,6 +7,7 @@ export const HOME_TITLE =
 export const SITE_DESCRIPTION =
   'AI Enablement & Program Manager in Berlin. Program management, organizational change, and AI adoption. Co-author of "AI Implementation for Managers".';
 export const LINKEDIN_URL = 'https://www.linkedin.com/in/sergeyvoelker/';
+export const GITHUB_URL = 'https://github.com/medi-v';
 export const BOOK_URL =
   'https://www.amazon.com/Introduction-Implementation-Managers-Non-Technical-Professionals/dp/B0GWT18PDC';
 
@@ -15,6 +16,7 @@ export const BOOK_URL =
 // Add more profile URLs here (GitHub, X, Amazon author page, Xing …) as you like.
 export const PROFILE_URLS = [
   LINKEDIN_URL,
+  GITHUB_URL,
   'https://medium.com/@sergey.medi',
   'https://www.amazon.com/stores/Sergey-V%C3%B6lker/author/B0H3R49925',
 ];

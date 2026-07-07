@@ -46,6 +46,12 @@ const work = [
     url: 'https://www.linkedin.com/posts/activity-7364536808044474369-l6i1',
     text: 'LucaNet’s first AI Summer School: 200+ colleagues in a digital classroom over two weeks — employee-led sessions, hands-on workshops, open discussions.',
   },
+  {
+    title: 'This site — designed and built with Claude Code',
+    source: 'GitHub',
+    url: 'https://github.com/medi-v/personal-website',
+    text: 'I built this entire website, including the animated “Waves” reading collection, pair-programming with Claude Code — Astro, Tailwind, deployed on Cloudflare. Source is public.',
+  },
 ];
 ---
 
@@ -200,19 +206,22 @@ const work = [
   <!-- ===== Selected work ===== -->
   <section aria-labelledby="work-heading" class="border-t border-clay py-16">
     <h2 id="work-heading" class="text-3xl font-medium tracking-tight">Selected work</h2>
-    <div class="mt-8 grid gap-4 sm:grid-cols-3">
+    <!-- One full-width horizontal row per item, stacked. -->
+    <div class="mt-8 flex flex-col gap-4">
       {
         work.map((item) => (
-          <article class="h-full">
+          <article>
             <a
               href={item.url}
               target="_blank"
               rel="noopener"
-              class="flex h-full flex-col rounded-lg border border-clay p-5 transition-colors hover:border-clay-dark hover:shadow-sm"
+              class="flex flex-col gap-4 rounded-lg border border-clay p-5 transition-colors hover:border-clay-dark hover:shadow-sm sm:flex-row sm:items-center sm:justify-between"
             >
-              <h3 class="text-lg leading-snug font-medium">{item.title}</h3>
-              <p class="mt-2 text-sm text-muted">{item.text}</p>
-              <span class="mt-auto pt-4 font-sans text-xs font-medium text-clay-text">
+              <div>
+                <h3 class="text-lg leading-snug font-medium">{item.title}</h3>
+                <p class="mt-2 text-sm text-muted">{item.text}</p>
+              </div>
+              <span class="shrink-0 font-sans text-xs font-medium text-clay-text sm:pl-6">
                 {item.source} ↗
               </span>
             </a>
