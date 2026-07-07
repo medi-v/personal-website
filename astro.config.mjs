@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
+import cloudflare from '@astrojs/cloudflare';
+
 // The live domain. Used to build absolute links in the RSS feed, sitemap,
 // canonical tags, and social-share metadata.
 // NOTE: sergeyvoelker.com is the intended domain (purchase pending). Until DNS
@@ -10,7 +12,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://sergeyvoelker.com',
   integrations: [sitemap()],
+
   vite: {
     plugins: [tailwindcss()],
   },
+
+  adapter: cloudflare(),
 });
