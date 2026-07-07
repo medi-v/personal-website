@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/medi-v/personal-website/actions/workflows/ci.yml/badge.svg)](https://github.com/medi-v/personal-website/actions/workflows/ci.yml)
 
+**Live site:** [sergeyvoelker.com](https://sergeyvoelker.com)
+
 A small, fast, static personal site built with [Astro](https://astro.build) and
 [Tailwind CSS](https://tailwindcss.com). It introduces me and collects my
 writing (native posts plus links to my Medium and LinkedIn articles).
