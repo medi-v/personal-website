@@ -133,6 +133,17 @@
 
   var birdCanvas = document.getElementById('birds');
 
+  // Bird mouse-steering — only for pointer:fine devices (mouse/trackpad, not touch).
+  // The birds canvas is position:fixed over the full viewport, so clientX/Y map directly.
+  var birdMouse = { x: -9999, y: -9999, on: false };
+  var hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+  if (hasFinePointer) {
+    document.addEventListener('pointermove', function (e) {
+      birdMouse.x = e.clientX; birdMouse.y = e.clientY; birdMouse.on = true;
+    });
+    document.addEventListener('pointerleave', function () { birdMouse.on = false; });
+  }
+
   function sizeCanvas(c) {
     c.width = c.clientWidth * devicePixelRatio;
     c.height = c.clientHeight * devicePixelRatio;
@@ -209,6 +220,7 @@
       phase: Math.random() * Math.PI * 2,
       flapSpeed: 5.5 + Math.random() * 3.5,        // rad/s — clearly visible
       bob: 5 + Math.random() * 8,                  // gentle vertical drift
+      vy: 0,                                        // vertical velocity for mouse steering
       born: now,
     });
   }
@@ -218,9 +230,9 @@
     var W = birdCanvas.clientWidth, H = birdCanvas.clientHeight;
     ctx.clearRect(0, 0, W, H);
 
-    if (now > nextBirdAt && birds.length < 3) {
+    if (now > nextBirdAt && birds.length < 5) {
       spawnBird(now);
-      nextBirdAt = now + 6000 + Math.random() * 9000; // next in 6–15 s
+      nextBirdAt = now + 4000 + Math.random() * 7000; // next in 4–11 s
     }
 
     birds = birds.filter(function (b) { return b.x > -80 && b.x < W + 80; });
@@ -228,8 +240,20 @@
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
+    var minY = birdCanvas.clientHeight * 0.04;
+    var maxY = birdCanvas.clientHeight * 0.55;
     birds.forEach(function (b) {
       b.x += b.vx * dt;
+      // Gentle mouse-steering: when the cursor gets close, the bird curves toward it.
+      if (hasFinePointer && birdMouse.on) {
+        var dx = birdMouse.x - b.x, dy = birdMouse.y - b.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 220 && dist > 0) {
+          b.vy += (dy / dist) * (1 - dist / 220) * 70 * dt;
+        }
+      }
+      b.vy *= (1 - 2.5 * dt);
+      b.y = Math.max(minY, Math.min(maxY, b.y + b.vy * dt));
       var t = (now - b.born) / 1000;
       var flap = Math.sin(t * b.flapSpeed + b.phase);   // -1 (down) .. 1 (up)
       var y = b.y + Math.sin(t * 0.6 + b.phase) * b.bob;
